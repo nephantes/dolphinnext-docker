@@ -12,40 +12,69 @@ Build docker image
 
 1. To build docker image first clone one of the latest dolphinnext-docker
 
+```
 git clone https://github.com/UMMS-Biocore/dolphinnext-docker.git
+```
 
 2. Build the image
-
+```
 cd dolphinnext-docker
 docker build -t dolphinnext-docker .
-
+```
 
 Start the container
 ---------
 
 1. We move database outside of the container to be able to keep the changes in the database everytime you start the container.
-Please choose a directory in your machine to mount. For example, I will use /mnt/sda1/export directory for this purpose.
+Please choose a directory in your machine to mount and replace `/path/to/mount` with your path. 
+* Note: Please don't change the target directory(`/export`) in the docker image. 
 
-mkdir -p /mnt/sda1/export/
+```
+mkdir -p /path/to/mount
+```
 
 2. While running the container;
-
-docker run --privileged -m 10G -p 8080:80 -v /mnt/sda1/export:/export -ti dolphinnext-docker /bin/bash
-
+```
+docker run -m 10G -p 8080:80 -v /path/to/mount:/export -ti dolphinnext-docker /bin/bash
+```
 *if you want to run a pre-build
-
-docker run --privileged -m 10G -p 8080:80 -v /mnt/sda1/export:/export -ti ummsbiocore/dolphinnext-docker /bin/bash
-
+```
+docker run -m 10G -p 8080:80 -v /path/to/mount:/export -ti ummsbiocore/dolphinnext-docker /bin/bash
+```
 or with R markdown support;
-
-docker run --privileged -m 10G -p 8080:80 -v /mnt/sda1/export:/export -ti ummsbiocore/dolphinnext-studio /bin/bash
-
+```
+docker run -m 10G -p 8080:80 -v /path/to/mount:/export -ti ummsbiocore/dolphinnext-studio /bin/bash
+```
 3. After you start the container, you need to start the mysql and apache server usign the command below;
-
+```
 startup
-
-4. Now, you can open your browser to access dolphinnext using the url below.
+```
+4. Verify that `dolphinnext` and `mysql` folders located inside of the `export` folder:
+```
+ls /export
+```
+5. Now, you can open your browser to access dolphinnext using the url below.
 
 http://localhost:8080/dolphinnext
+
+Running on the Amazon or Google Cloud
+------
+We define `localhost:8080` in /path/to/mount/dolphinnext/config/.sec file and use that to log in or other operations. You need to change `localhost` to that IP address or amazon/google domain you use. So static IP address would solve the issue that you will not need to change it every time you create an instance. Please update `BASE_PATH` and `PUBWEB_URL` as follows:
+
+```
+BASE_PATH = http://localhost:8080/dolphinnext
+PUBWEB_URL = http://localhost:8080/dolphinnext/tmp/pub
+```
+
+to
+```
+BASE_PATH = http://your_temporary_domain_name:8080/dolphinnext
+PUBWEB_URL = http://your_temporary_domain_name:8080/dolphinnext/tmp/pub
+```
+* Please don’t change other lines because others are used inside of docker.
+
+
+
+ 
 
 
